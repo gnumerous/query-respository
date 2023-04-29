@@ -1,0 +1,52 @@
+name: basic_query
+text:
+{
+  "query" : {
+    "something" : [
+        {
+            "${field1}" : "${value1}"
+        }
+    ]
+  }
+}
+
+
+====
+name:nother_query
+text:{
+  "query" : {
+    "something_else" : [
+        {
+            "known_field" : "${value1}"
+        }
+    ]
+  }
+}
+
+====================================================================================
+====
+name:
+            third_query
+text:
+
+{
+  "query" : {
+    "something_else" : [
+        {
+            "some_other_field" : "${value1}"
+        }
+    ]
+  }
+}
+====================================================================================
+name:         static_query
+text:
+{
+  "query" : {
+    "something_else" : [
+        {
+            "value" : "string"
+        }
+    ]
+  }
+}
