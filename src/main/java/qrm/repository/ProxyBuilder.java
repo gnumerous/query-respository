@@ -69,7 +69,7 @@ public class ProxyBuilder<R, T> {
                             ((Collection) response.get()).add(buildInstance(idx));
                         }
                     } else {
-                        response.set(returnType);
+                        response.set(buildInstance(0));
                     }
                 } catch (ClassNotFoundException e) {
                     throw new RuntimeException(e);
@@ -116,14 +116,14 @@ public class ProxyBuilder<R, T> {
                         System.out.println("name: " + annotation.getClass().getName());
                     })
                     .filter(annotation -> annotation.toString().contains("@qrm.repository.annotation.Query")).findFirst()
-                    .ifPresent(gotit -> result.putAll(regexParse(gotit.toString())));
+                    .ifPresent(gotit -> putAll(result, regexParse(gotit.toString())));
 
             Arrays.stream(method.getAnnotations())
                     .peek(annotation -> {
                         System.out.println("name: " + annotation.getClass().getName());
                     })
                     .filter(annotation -> annotation.toString().contains("@qrm.repository.annotation.Query")).findFirst()
-                    .ifPresent(gotit2 -> result.putAll(regexParse(gotit2.toString())));
+                    .ifPresent(gotit -> putAll(result, regexParse(gotit.toString())));
             return result;
         }
 
@@ -131,8 +131,16 @@ public class ProxyBuilder<R, T> {
             return "select id, first_name, last_name from employee where id = ${id}";
         }
 
-        private void t() {
-
+        private static void putAll(Map<String, String> result, Map<String, String> parsed) {
+            parsed.forEach((k, v) -> {
+                if ((k.equals("dataType") && v.equals("void.class")) ||
+                        (k.equals("query") && v.equals(""))){
+                    System.out.printf("ignoring %s, %s%n", k, v);
+                } else {
+                    System.out.printf("putting %s, %s to map%n", k, v);
+                    result.put(k, v);
+                }
+            });
         }
 
         private T buildInstance(int idx) {
@@ -166,7 +174,7 @@ public class ProxyBuilder<R, T> {
                 String key = found.substring(0, idx);
                 String value = found.substring(idx + 1).trim();
                 System.out.println(key + "|" + value);
-                if (!StringUtils.isNullOrEmpty(value)) {
+                if (!StringUtils.isNullOrEmpty(value) && !value.equals("void.class")) {
                     map.put(key, value);
                 }
             }
